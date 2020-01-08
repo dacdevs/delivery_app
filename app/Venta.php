@@ -13,4 +13,8 @@ class Venta extends Model
     public function cliente(){
         return $this->belongsTo(Cliente::class);
     }
+
+    public function detalle(){
+        return $this->hasOne(VentaDetalle::class);
+    }
 }

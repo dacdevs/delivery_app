@@ -47,7 +47,8 @@ class VentaController extends Controller
         $venta->tarjeta_id = $request->input("tarjeta_id");
         $tarjeta = Tarjeta::find($request->input("tarjeta_id"));
         $venta->tarjeta = $tarjeta->numero_final;
-        $venta->monto = $request->input("total");
+        $direccion = Direccion::find($request->input("direccion_id"));
+        $venta->direccion = $direccion->direccion;
 
         if($venta->save()){
 
@@ -74,6 +75,85 @@ class VentaController extends Controller
             "status" => 500,
             "message" => "Ha ocurrido un error interno",
         ], 500);
+    }
+
+    /**
+     * Modificar estado
+     *
+     * Modificar estado de una venta
+     *
+     * @bodyParam id int required Id de la venta
+     * @bodyParam estado string required Nombre del estado (Comprado,Enviado,Entregado)
+     */
+    public function postModificarEstado(Request $request){
+        $validator = Validator::make($request->all(),[
+            "id" => "required",
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                "status" => 500,
+                "message" => "Ha ocurrido un error de validación",
+                "errors" => $validator->errors(),
+            ], 500);
+        }
+
+
+        $venta = Venta::find($request->input("id"));
+        $venta->estado = $request->input("estado");
+
+        if($venta->save()){
+
+            return response()->json([
+                "status" => 200,
+                "message" => "Venta modificada satisfactoriamente",
+            ],200);
+
+        }
+
+        return response()->json([
+            "status" => 500,
+            "message" => "Ha ocurrido un error interno",
+        ], 500);
+    }
+
+    /**
+     * Listar
+     *
+     * Listar las ventas de un cliente
+     *
+     * @queryParam cliente_id int required Id del cliente
+     */
+    public function getListar(Request $request){
+        $ventas = Venta::where("cliente_id",$request->input("cliente_id"))->get();
+        return response()->json([
+            "status" => 200,
+            "message" => "Lista",
+            "data" => $ventas,
+        ],200);
+    }
+
+    /**
+     * Detalle
+     *
+     * Detalle de una venta
+     *
+     * @queryParam id int required Id de la venta
+     */
+    public function getDetalle($id){
+        $venta = Venta::where("id",$id)->with("detalle")->first();
+        if($venta){
+            return response()->json([
+                "status" => 200,
+                "message" => "Venta encontrada",
+                "data" => $venta,
+            ],200);
+        }
+
+        return response()->json([
+            "status" => 500,
+            "message" => "Venta no encontrada",
+        ],500);
     }
 
 }

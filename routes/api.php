@@ -40,4 +40,7 @@ Route::post("direccion/actualizar","Api\DireccionController@postAgregar");
 
 //API de Ventas
 Route::post("venta/crear","Api\VentaController@postAgregar");
+Route::post("venta/modificarEstado","Api\VentaController@postModificarEstado");
+Route::get("venta/listar","Api\VentaController@getListar");
+Route::get("venta/detalle/{id}","Api\VentaController@getDetalle");
 
